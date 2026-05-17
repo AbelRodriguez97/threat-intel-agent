@@ -1,0 +1,8 @@
+# Core dependencies — to be populated as the project grows
+# google-generativeai
+# langchain
+# langchain-google-genai
+# requests
+# pydantic
+# python-dotenv
+EOF
