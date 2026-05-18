@@ -222,3 +222,6 @@ __marimo__/
 reports/output/
 .vscode/
 .idea/
+.venv/
+venv/
+tmp/
