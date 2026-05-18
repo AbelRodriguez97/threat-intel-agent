@@ -216,3 +216,12 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+.env
+*.log
+reports/output/
+.vscode/
+.idea/
+.venv/
+venv/
+tmp/
