@@ -117,16 +117,15 @@ You can get a free Gemini API key at [aistudio.google.com](https://aistudio.goog
 ## 🗺️ Roadmap
 
 - [x] Project setup and initial structure
-- [ ] CISA KEV feed ingestion
-- [ ] Gemini API integration for CVE summarization
+- [x] CISA KEV feed ingestion
+- [x] Gemini API integration for CVE summarization
+- [x] Unit tests with pytest
+- [x] Sample reports in examples/
+- [x] Daily report generation in Markdown
 - [ ] IOC extraction with regex + LLM validation
-- [ ] LangChain agent with multi-tool orchestration
-- [ ] AlienVault OTX integration
-- [ ] Severity classification engine
-- [ ] Daily report generation in Markdown
+- [ ] LangChain agent with multi-tool orchestration (week 3)
 - [ ] GitHub Actions workflow for daily execution
-- [ ] Unit tests with pytest
-- [ ] Sample reports in `examples/`
+- [ ] AlienVault OTX integration
 
 ---
 
