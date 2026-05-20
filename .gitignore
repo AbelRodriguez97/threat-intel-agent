@@ -225,3 +225,9 @@ reports/output/
 .venv/
 venv/
 tmp/
+
+# Generated reports (per-execution)
+reports/
+
+# But keep the curated examples
+!examples/
