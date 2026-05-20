@@ -227,7 +227,7 @@ venv/
 tmp/
 
 # Generated reports (per-execution)
-reports/
+/reports/
 
 # But keep the curated examples
 !examples/
