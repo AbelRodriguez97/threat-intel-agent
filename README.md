@@ -166,3 +166,5 @@ MIT — see [LICENSE](LICENSE).
 **Abel Rodriguez** — Software Engineer @ Accenture, interested in applying AI to security operations.
 
 📫 [LinkedIn](https://www.linkedin.com/in/abel-rodriguez-gomez-20a446132/) · 📧 abelrodr42malaga@gmail.com
+
+-
