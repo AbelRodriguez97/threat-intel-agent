@@ -4,6 +4,11 @@ pydantic>=2.5.0
 google-genai>=1.0.0
 python-dotenv>=1.0.0
 
+# LangChain stack
+langchain>=0.3.0
+langgraph>=0.2.0
+langchain-google-genai>=2.0.0
+
 # Development dependencies
 pytest>=7.4.0
 requests-mock>=1.11.0
