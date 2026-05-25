@@ -5,7 +5,7 @@
 ![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat&logo=python&logoColor=white)
 ![Gemini](https://img.shields.io/badge/Gemini-API-8E75B2?style=flat&logo=googlegemini&logoColor=white)
 ![LangChain](https://img.shields.io/badge/LangChain-Agents-1C3C3C?style=flat&logo=langchain&logoColor=white)
-![Status](https://img.shields.io/badge/status-in%20development-yellow)
+[![Daily Report](https://github.com/AbelRodriguez97/threat-intel-agent/actions/workflows/daily-report.yml/badge.svg)](https://github.com/AbelRodriguez97/threat-intel-agent/actions/workflows/daily-report.yml)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 ---
@@ -20,12 +20,13 @@ The project targets one of the most repetitive tasks in security operations: tur
 
 ## 🧩 What it does
 
-- 🔄 **Ingests** threat intelligence feeds from public sources (CISA KEV catalog, AlienVault OTX, NVD)
+- 🔄 **Ingests** threat intelligence feeds from public sources (CISA KEV catalog)
 - 🤖 **Uses Gemini API** to summarize vulnerabilities in plain English
 - 🔎 **Extracts IOCs** automatically: CVE IDs, affected products, vendor information
-- 📊 **Classifies severity** based on CVSS, exploitation status and asset criticality
+- 📊 **Classifies severity** based on exploitation status and asset criticality
 - 📝 **Generates daily reports** in Markdown with prioritized findings and recommended actions
 - 🤖 **LangChain agent orchestration**: the agent decides which tools to invoke based on the context
+- ⚙️ **Runs automatically every day** via GitHub Actions
 
 ---
 
@@ -34,29 +35,31 @@ The project targets one of the most repetitive tasks in security operations: tur
 ```
 ┌──────────────────┐
 │  CISA KEV Feed   │
-│  AlienVault OTX  │──┐
-│  NVD API         │  │
-└──────────────────┘  │
-                      ▼
-              ┌───────────────┐
-              │ Feed Ingestor │
-              └───────┬───────┘
-                      ▼
-            ┌─────────────────────┐
-            │  LangChain Agent    │
-            │  (Gemini-powered)   │
-            │                     │
-            │  Tools:             │
-            │  - fetch_cves       │
-            │  - enrich_cve       │
-            │  - classify         │
-            │  - generate_report  │
-            └─────────┬───────────┘
-                      ▼
-            ┌─────────────────────┐
-            │  Markdown Report    │
-            │  (committed daily)  │
-            └─────────────────────┘
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────┐
+│  Feed Ingestor   │
+│  (CISAClient)    │
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────────────┐
+│  LangGraph ReAct Agent   │
+│  (Gemini-powered)        │
+│                          │
+│  Tools:                  │
+│  - fetch_recent_vulns    │
+│  - analyze_vulnerability │
+│  - save_report           │
+└────────┬─────────────────┘
+         │
+         ▼
+┌──────────────────┐
+│  Markdown Report │
+│  (auto-committed │
+│   daily via CI)  │
+└──────────────────┘
 ```
 
 ---
@@ -64,11 +67,10 @@ The project targets one of the most repetitive tasks in security operations: tur
 ## 🛠️ Tech Stack
 
 - **Python 3.11+**
-- **Google Gemini API** — LLM backbone
-- **LangChain** — agent orchestration and tool calling
-- **requests** — HTTP client for public feeds
-- **pydantic** — data validation
-- **GitHub Actions** — daily automated execution (planned)
+- **Google Gemini API** — LLM backbone (structured output via Pydantic schemas)
+- **LangChain + LangGraph** — ReAct agent orchestration and tool calling
+- **requests + pydantic** — HTTP client and data validation
+- **GitHub Actions** — daily automated execution and report commits
 
 ---
 
@@ -76,13 +78,17 @@ The project targets one of the most repetitive tasks in security operations: tur
 
 ```
 threat-intel-agent/
+├── .github/
+│   └── workflows/
+│       └── daily-report.yml   # Daily CI pipeline
 ├── src/
-│   ├── feeds/         # Public feed clients (CISA, OTX, NVD)
-│   ├── agents/        # LangChain agent definitions and tools
-│   ├── extractors/    # IOC extraction logic
-│   └── reports/       # Markdown report generation
-├── tests/             # Unit tests
-├── examples/          # Sample inputs and generated reports
+│   ├── feeds/                 # CISA KEV feed client
+│   ├── agents/                # LangGraph agent, tools and Gemini analyzer
+│   ├── reports/               # Markdown report generation
+│   ├── main.py                # Imperative pipeline entry point
+│   └── agent_main.py          # Agentic pipeline entry point
+├── tests/                     # Unit tests (15 passing)
+├── examples/                  # Sample reports
 ├── requirements.txt
 └── .env.example
 ```
@@ -91,8 +97,6 @@ threat-intel-agent/
 
 ## 🚀 Quick start
 
-> ⚠️ This project is in active development. Functionality is being added incrementally.
-
 ```bash
 # Clone the repository
 git clone https://github.com/AbelRodriguez97/threat-intel-agent.git
@@ -100,7 +104,8 @@ cd threat-intel-agent
 
 # Create a virtual environment
 python -m venv .venv
-source .venv/bin/activate    # On Windows: .venv\Scripts\activate
+source .venv/bin/activate         # Linux/macOS
+# .\.venv\Scripts\Activate.ps1   # Windows PowerShell
 
 # Install dependencies
 pip install -r requirements.txt
@@ -114,35 +119,74 @@ You can get a free Gemini API key at [aistudio.google.com](https://aistudio.goog
 
 ---
 
+## 🤖 Two ways to run
+
+This project ships with two entrypoints that solve the same problem with different paradigms:
+
+### Imperative pipeline (`src/main.py`)
+
+Hard-coded orchestration: fetch → analyze → report. Used by the daily CI workflow.
+
+```bash
+python -m src.main --limit 2
+```
+
+### Agentic pipeline (`src/agent_main.py`) ⭐
+
+The same workflow orchestrated by a **LangGraph ReAct agent** powered by Gemini. The agent decides which tools to call based on a natural-language request.
+
+```bash
+python -m src.agent_main
+# or with a custom request:
+python -m src.agent_main --request "Analyze the latest 2 CVEs and generate a report"
+```
+
+The agent has three tools: `fetch_recent_vulnerabilities`, `analyze_vulnerability` and `save_report_from_analyses`. It composes them dynamically based on the user's instruction.
+
+---
+
+## ⚠️ A note on running with the free tier
+
+This project uses the **free tier** of Google's Gemini API by default. The free tier enforces two independent quotas:
+
+- **Per-minute limit**: 5 requests/min for `gemini-2.5-flash`. The project mitigates this with client-side throttling in `GeminiAnalyzer` (15-second minimum gap between calls).
+- **Per-day limit**: 20 requests/day for `gemini-2.5-flash`. Once exhausted, the API returns `429 RESOURCE_EXHAUSTED` until midnight UTC.
+
+A typical agent run with 2 CVEs consumes ~5 LLM calls. The default request in `src/agent_main.py` is sized to fit comfortably within both quotas.
+
+---
+
 ## 🗺️ Roadmap
 
 - [x] Project setup and initial structure
 - [x] CISA KEV feed ingestion
 - [x] Gemini API integration for CVE summarization
-- [x] Unit tests with pytest
-- [x] Sample reports in examples/
-- [x] Daily report generation in Markdown
+- [x] Severity classification and Markdown report generation
+- [x] Unit tests with pytest (15 passing)
+- [x] Sample reports in `examples/`
+- [x] LangGraph agent with multi-tool orchestration
+- [x] Client-side throttling and LLM cost optimization
+- [x] GitHub Actions workflow for daily automated execution
 - [ ] IOC extraction with regex + LLM validation
-- [ ] LangChain agent with multi-tool orchestration (week 3)
-- [ ] GitHub Actions workflow for daily execution
 - [ ] AlienVault OTX integration
+- [ ] Agent memory with LangGraph checkpointers
 
 ---
 
 ## 🧠 What I'm learning
 
-- Designing **multi-tool LLM agents** with LangChain
+- Designing **multi-tool LLM agents** with LangGraph and LangChain
 - Working with **Google Gemini API** for structured output extraction
 - Building **secure API integrations** (secrets management, rate limiting)
-- Threat intelligence data formats (STIX-like patterns, CVE schemas)
+- Threat intelligence data formats (CVE schemas, CISA KEV)
 - CI/CD for AI pipelines with GitHub Actions
 
 ---
 
 ## 📄 Sample output
 
-See [`examples/sample-report.md`](./examples/sample-report.md) for a real
-report generated by the pipeline.
+- [`examples/sample-report.md`](./examples/sample-report.md) — generated by the imperative pipeline
+- [`examples/sample-agent-report.md`](./examples/sample-agent-report.md) — generated by the LangGraph agent
 
 ---
 
@@ -150,8 +194,8 @@ report generated by the pipeline.
 
 - [CISA Known Exploited Vulnerabilities Catalog](https://www.cisa.gov/known-exploited-vulnerabilities-catalog)
 - [LangChain documentation](https://python.langchain.com/)
+- [LangGraph documentation](https://langchain-ai.github.io/langgraph/)
 - [Gemini API documentation](https://ai.google.dev/gemini-api/docs)
-- [AlienVault OTX](https://otx.alienvault.com/)
 
 ---
 
@@ -166,5 +210,3 @@ MIT — see [LICENSE](LICENSE).
 **Abel Rodriguez** — Software Engineer @ Accenture, interested in applying AI to security operations.
 
 📫 [LinkedIn](https://www.linkedin.com/in/abel-rodriguez-gomez-20a446132/) · 📧 abelrodr42malaga@gmail.com
-
--
