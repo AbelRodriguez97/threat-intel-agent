@@ -2,6 +2,7 @@
 
 > AI-powered agent that ingests public threat intelligence feeds, extracts Indicators of Compromise (IOCs) using Large Language Models, classifies severity, and generates automated daily reports.
 
+![Status](https://img.shields.io/badge/status-active-brightgreen)
 ![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat&logo=python&logoColor=white)
 ![Gemini](https://img.shields.io/badge/Gemini-API-8E75B2?style=flat&logo=googlegemini&logoColor=white)
 ![LangChain](https://img.shields.io/badge/LangChain-Agents-1C3C3C?style=flat&logo=langchain&logoColor=white)
@@ -167,9 +168,8 @@ A typical agent run with 2 CVEs consumes ~5 LLM calls. The default request in `s
 - [x] LangGraph agent with multi-tool orchestration
 - [x] Client-side throttling and LLM cost optimization
 - [x] GitHub Actions workflow for daily automated execution
-- [ ] IOC extraction with regex + LLM validation
-- [ ] AlienVault OTX integration
-- [ ] Agent memory with LangGraph checkpointers
+- [ ] AlienVault OTX integration (second threat feed)
+- [ ] Agent memory with LangGraph checkpointers (multi-turn conversations)
 
 ---
 
@@ -207,6 +207,7 @@ MIT — see [LICENSE](LICENSE).
 
 ## 👤 Author
 
-**Abel Rodriguez** — Software Engineer @ Accenture, interested in applying AI to security operations.
+**Abel Rodriguez** — Software Engineer @ Accenture (Malaga, Spain)
+Focused on the intersection of cybersecurity and AI.
 
 📫 [LinkedIn](https://www.linkedin.com/in/abel-rodriguez-gomez-20a446132/) · 📧 abelrodr42malaga@gmail.com
