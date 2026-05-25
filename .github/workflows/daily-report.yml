@@ -46,7 +46,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add reports/
+          git add -f reports/
           # Only commit if there are changes (avoids empty commits)
           git diff --staged --quiet || git commit -m "chore(reports): auto-generate daily threat intelligence report [skip ci]"
           git push
